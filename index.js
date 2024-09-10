@@ -82,8 +82,6 @@ class FdyFetchClient {
       // If the response indicates an error, throw a custom error
       if (!response?.ok) {
         const errorBody = response?.body; // Capture the error response body
-        console.log(typeof errorBody); // Log the type of the response body
-        console.log(this.#canBeParsed(errorBody)); // Log if the body can be parsed
 
         // Throw a custom error with detailed information
         throw new FdyFetchClientError(
