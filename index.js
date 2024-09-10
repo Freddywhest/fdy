@@ -248,3 +248,4 @@ class FdyFetchClient {
 // Create an instance of FdyFetchClient and export it
 const fdy = new FdyFetchClient({}, false);
 module.exports = fdy;
+module.exports.FdyFetchClientError = FdyFetchClientError;
