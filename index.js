@@ -15,16 +15,13 @@ class FdyFetchClientError extends Error {
   /**
    * Constructs a new FdyFetchClientError instance
    * @param {string} message - Error message to be displayed
-   * @param {number} status - HTTP status code associated with the error
    * @param {object} response - Response data from the server
    * @param {object} config - Configuration of the request that caused the error
    */
-  constructor(message, status, response, config) {
+  constructor(message, response) {
     super(message); // Initialize the base Error class with the message
     this.name = "FetchClientError"; // Set a specific error name
-    this.status = status; // Store the status code in the error
     this.response = response; // Store the server response in the error
-    this.config = config; // Store the request configuration in the error
   }
 }
 
@@ -86,11 +83,25 @@ class FdyFetchClient {
         // Throw a custom error with detailed information
         throw new FdyFetchClientError(
           `Request failed with status code: ${response?.statusCode}`, // Error message
-          response?.statusCode, // HTTP status code
           this.#canBeParsed(errorBody)
-            ? { data: JSON.parse(errorBody) } // Parsed JSON data
-            : errorBody, // Raw body text if not JSON
-          { method, url, headers: { ...this.defaults.headers, ...headers } } // Request configuration
+            ? {
+                data: JSON.parse(errorBody),
+                status: response?.statusCode,
+                config: {
+                  method,
+                  url,
+                  headers: { ...this.defaults.headers, ...headers },
+                },
+              } // Parsed JSON data
+            : {
+                data: errorBody,
+                status: response?.statusCode,
+                config: {
+                  method,
+                  url,
+                  headers: { ...this.defaults.headers, ...headers },
+                },
+              } // Raw body text if not JSON
         );
       }
 
