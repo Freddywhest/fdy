@@ -16,12 +16,13 @@ class FdyFetchClientError extends Error {
    * Constructs a new FdyFetchClientError instance
    * @param {string} message - Error message to be displayed
    * @param {object} response - Response data from the server
-   * @param {object} config - Configuration of the request that caused the error
+   * @param {object} request - Response data from the server
    */
-  constructor(message, response) {
+  constructor(message, response, request) {
     super(message); // Initialize the base Error class with the message
     this.name = "FetchClientError"; // Set a specific error name
     this.response = response; // Store the server response in the error
+    this.request = request; // Store the request data in the error
   }
 }
 
@@ -87,21 +88,29 @@ class FdyFetchClient {
             ? {
                 data: JSON.parse(errorBody),
                 status: response?.statusCode,
+                headers: response?.headers,
                 config: {
                   method,
                   url,
-                  headers: { ...this.defaults.headers, ...headers },
                 },
               } // Parsed JSON data
-            : {
+              : {
                 data: errorBody,
                 status: response?.statusCode,
+                headers: response?.headers,
                 config: {
                   method,
                   url,
-                  headers: { ...this.defaults.headers, ...headers },
                 },
-              } // Raw body text if not JSON
+              }, // Raw body text if not JSON
+            {
+              headers: { ...this.defaults.headers, ...headers },
+              config: {
+                method,
+                url,
+              },
+            } // Request configuration
+
         );
       }
 
